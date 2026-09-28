@@ -51,6 +51,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         e.target.tagName, String(e.target.src || e.target.href || ''));
       return;
     }
+    // Cross-origin scripts (e.g. a CDN library) report as a bare "Script
+    // error." with no filename/line — the browser withholds detail for
+    // security, not because anything actually broke. Not actionable, so
+    // don't show it to the end user; still visible in the console.
+    if (e.message === 'Script error.' && !e.filename) {
+      console.warn('[bundle] cross-origin script error (no detail available):', e);
+      return;
+    }
     var p = document.body || document.documentElement;
     var d = document.getElementById('__bundler_err') || p.appendChild(document.createElement('div'));
     d.id = '__bundler_err';
